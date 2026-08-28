@@ -1,0 +1,706 @@
+/* ==================================================================
+   styles.css — Jay's portfolio
+   ------------------------------------------------------------------
+   ORGANIZATION (search for the banner comments to jump around):
+     1. THEME CONFIG (colors + fonts — edit here first)
+     2. Base / reset
+     3. Sticky top nav
+     4. Hero
+     5. Education step-reveal
+     6. Portfolio toolbar + views
+     7. Timeline (nervous-system SVG + action-potential scrollbar)
+     8. List view (squircles)
+     9. Detailed List view
+    10. Shared detail card + modal
+    11. Certifications
+    12. Endorsements
+    13. Docs page (resume / CV)
+    14. Responsive rules
+   ================================================================== */
+
+/* ==================================================================
+   1. THEME CONFIG — change colors/fonts here
+   ------------------------------------------------------------------
+   The page is one continuous blue gradient: day-sky blue at the top
+   (hero) → deep "nervous system" blue for the timeline → near-night
+   blue below (certs / endorsements). Sample colors from the design:
+   #2756F5 (top), #001176 (timeline), #041A40 (bottom) — tuned slightly
+   for smoother blending. Adjust the three gradient stops below.
+   ================================================================== */
+:root {
+  /* --- background gradient stops (top → middle → bottom) --- */
+  --bg-top:      #2b57ec;   /* day-sky blue behind the hero            */
+  --bg-mid:      #101c8a;   /* transition blue behind education        */
+  --bg-timeline: #050f6b;   /* deep nerve blue behind the timeline     */
+  --bg-deep:     #041a40;   /* night blue behind certs/endorsements    */
+
+  /* --- text + accents --- */
+  --text:        #ffffff;
+  --text-dim:    rgba(255, 255, 255, 0.72);
+  --accent:      #5ee7ff;   /* electric cyan: nerve glow, links, focus */
+  --card-bg:     rgba(255, 255, 255, 0.07);  /* translucent card fill  */
+  --card-border: rgba(255, 255, 255, 0.16);
+
+  /* --- portfolio item type colors (keep in sync with TYPE_CONFIG in
+         js/portfolio.js if you change them) --- */
+  --type-project:     #4fc3f7;
+  --type-competition: #ffd54f;
+  --type-work:        #81c784;
+  --type-experience:  #b39dfb;
+
+  /* --- fonts (vendored in lib/fonts/) ---
+     Headings: Montserrat.  Body: Open Sans.
+     To switch (e.g. to Futura PT), vendor the font files and change
+     these two variables. */
+  --font-heading: 'Montserrat', 'Segoe UI', sans-serif;
+  --font-body:    'Open Sans', 'Segoe UI', sans-serif;
+
+  --nav-height: 60px;
+}
+
+/* ==================================================================
+   2. Base / reset
+   ================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-height) + 12px); }
+
+body {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  /* The full-page gradient: sky → nerve blue → night. */
+  background: linear-gradient(
+    180deg,
+    var(--bg-top)      0%,
+    var(--bg-mid)      28%,
+    var(--bg-timeline) 52%,
+    var(--bg-deep)     85%
+  );
+  background-attachment: fixed; /* gradient stays put while scrolling */
+}
+
+h1, h2, h3, h4 { font-family: var(--font-heading); line-height: 1.25; }
+
+a { color: var(--accent); }
+
+img { max-width: 100%; }
+
+button { font-family: inherit; cursor: pointer; }
+
+.section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 64px 24px;
+}
+
+.section-title {
+  font-size: 2rem;
+  margin: 0 0 28px;
+  letter-spacing: 0.02em;
+}
+
+body.modal-open { overflow: hidden; } /* freeze page scroll behind popup */
+
+/* ==================================================================
+   3. Sticky top nav
+   ================================================================== */
+.top-nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  height: var(--nav-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  background: rgba(4, 12, 60, 0.55);      /* translucent over the gradient */
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nav-links { display: flex; gap: 26px; }
+
+.nav-links a {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text);
+  text-decoration: none;
+  padding: 6px 2px;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.2s, color 0.2s;
+}
+.nav-links a:hover, .nav-links a.active { color: var(--accent); border-color: var(--accent); }
+
+.nav-icons { display: flex; gap: 16px; align-items: center; }
+.nav-icons a { color: var(--text); transition: color 0.2s, transform 0.2s; }
+.nav-icons a:hover { color: var(--accent); transform: translateY(-2px); }
+.nav-icon { width: 22px; height: 22px; display: block; }
+
+/* ==================================================================
+   4. Hero — rotating photos (left) + cycling statements (right)
+   ================================================================== */
+.hero {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 64px 24px 80px;
+  display: grid;
+  grid-template-columns: minmax(280px, 460px) 1fr;
+  gap: 48px;
+  align-items: center;
+  min-height: 68vh;
+}
+
+.hero-photos {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 18px 50px rgba(0, 0, 20, 0.45);
+}
+
+.hero-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.9s ease;   /* cross-fade between photos */
+}
+.hero-photo.active { opacity: 1; }
+
+.hero-text h1 { font-size: clamp(2.4rem, 5vw, 3.6rem); margin: 0 0 14px; }
+
+.hero-statement {
+  font-size: clamp(1.2rem, 2.6vw, 1.7rem);
+  color: var(--text-dim);
+  min-height: 2.4em;                /* keeps layout stable while cycling */
+  margin: 0 0 18px;
+  transition: opacity 0.25s ease;
+}
+.hero-statement.fading { opacity: 0; }
+
+/* Tracker bubbles: one dot per statement; the active one glows. */
+.hero-bubbles { display: flex; gap: 10px; }
+.bubble {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  background: transparent;
+  padding: 0;
+  transition: background 0.25s, box-shadow 0.25s;
+}
+.bubble.active {
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+
+/* ==================================================================
+   5. Education — sequential step reveal
+   ------------------------------------------------------------------
+   Steps sit on a rising "staircase". Each card fades/slides in one
+   after another (delay driven by --step-index). The line figure
+   lifting its credential stands under the CURRENT stage.
+   ================================================================== */
+.education-steps {
+  display: flex;
+  gap: 32px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.edu-step {
+  flex: 1 1 240px;
+  max-width: 340px;
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  /* stagger: each step waits for the previous one */
+  transition-delay: calc(var(--step-index) * 0.45s);
+}
+/* Rising staircase effect: later stages sit higher. */
+.edu-step:nth-child(2) { margin-bottom: 26px; }
+.edu-step:nth-child(3) { margin-bottom: 52px; }
+.edu-step:nth-child(4) { margin-bottom: 78px; }
+
+.education-steps.revealed .edu-step { opacity: 1; transform: translateY(0); }
+
+.edu-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 18px 20px;
+}
+.edu-title { margin: 0 0 4px; font-size: 1.1rem; }
+.edu-subtitle { margin: 0 0 6px; color: var(--text-dim); font-size: 0.85rem; }
+.edu-detail { margin: 2px 0; font-size: 0.9rem; }
+.edu-honors { color: var(--type-competition); }
+.edu-school { margin: 8px 0 2px; color: var(--text-dim); font-size: 0.9rem; }
+.edu-date { margin: 0; font-size: 0.85rem; color: var(--accent); }
+
+/* The credential-lifting figure below the current stage. */
+.edu-figure { height: 76px; margin-top: 10px; text-align: center; }
+.edu-figure-svg { height: 100%; }
+.edu-figure-line { stroke: var(--text); stroke-width: 2.4; stroke-linecap: round; }
+.edu-figure-credential { fill: var(--accent); opacity: 0.9; }
+/* Figure pops in after its step's card. */
+.education-steps.revealed .edu-figure-svg {
+  animation: figure-pop 0.5s ease both;
+  animation-delay: calc((var(--step-index, 3) + 2) * 0.45s);
+}
+@keyframes figure-pop {
+  from { opacity: 0; transform: translateY(12px) scale(0.85); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ==================================================================
+   6. Portfolio toolbar + view containers
+   ================================================================== */
+.portfolio-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.view-label { font-family: var(--font-heading); font-weight: 600; }
+
+.view-select {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  padding: 7px 12px;
+}
+.view-select option { color: #06123a; } /* readable in the native dropdown */
+
+.tl-zoom-controls { display: flex; gap: 6px; }
+.tl-zoom-btn {
+  width: 34px;
+  height: 34px;
+  font-size: 1.15rem;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+.tl-zoom-btn:hover { background: rgba(94, 231, 255, 0.25); }
+
+.tl-legend { display: flex; gap: 14px; margin-left: auto; flex-wrap: wrap; }
+.legend-item {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.legend-item::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--type-color);
+  box-shadow: 0 0 6px var(--type-color);
+}
+
+/* ==================================================================
+   7. Timeline — nervous-system SVG
+   ================================================================== */
+.timeline-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;              /* hide native bar (Firefox) —   */
+}
+.timeline-scroll::-webkit-scrollbar { display: none; } /* — and WebKit */
+.timeline-scroll.vertical { overflow: visible; }  /* mobile: flows with page */
+
+.timeline-svg-host { line-height: 0; }
+
+/* Spinal cord: glow layer + bright core. */
+.tl-cord {
+  stroke: var(--accent);
+  stroke-width: 5;
+  fill: none;
+  stroke-linecap: round;
+}
+.tl-cord-glow {
+  stroke: var(--accent);
+  stroke-width: 16;
+  fill: none;
+  opacity: 0.18;
+  stroke-linecap: round;
+}
+
+.tl-year-tick { fill: #ffffff; opacity: 0.9; }
+.tl-year-label {
+  fill: var(--text-dim);
+  font-family: var(--font-heading);
+  font-size: 13px;
+}
+
+/* Event nodes: branch nerve + soma circle + glyph + label.
+   Hover = shadow/scale ONLY (detail opens on click, never hover). */
+.tl-node { cursor: pointer; outline: none; }
+.tl-branch { stroke-width: 2.5; fill: none; opacity: 0.85; }
+.tl-soma {
+  stroke: rgba(255, 255, 255, 0.85);
+  stroke-width: 1.5;
+  transition: transform 0.18s ease, filter 0.18s ease;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.tl-node:hover .tl-soma,
+.tl-node:focus-visible .tl-soma {
+  transform: scale(1.25);
+  filter: drop-shadow(0 0 10px var(--type-color));
+}
+.tl-glyph {
+  fill: #06123a;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 13px;
+  pointer-events: none;
+}
+.tl-label {
+  fill: var(--text);
+  font-family: var(--font-body);
+  font-size: 12.5px;
+}
+
+/* --- Action-potential scrollbar --------------------------------- */
+.ap-scrollbar {
+  position: relative;
+  height: 34px;
+  margin-top: 10px;
+  touch-action: none;
+}
+.ap-scrollbar.hidden { display: none; }
+
+/* The nerve track the spike travels along. */
+.ap-track {
+  position: absolute;
+  left: 0; right: 0;
+  top: 50%;
+  height: 3px;
+  transform: translateY(-50%);
+  border-radius: 2px;
+  background: linear-gradient(90deg,
+    rgba(94, 231, 255, 0.1),
+    rgba(94, 231, 255, 0.45),
+    rgba(94, 231, 255, 0.1));
+}
+
+/* The draggable action-potential spike (thumb). */
+.ap-thumb {
+  position: absolute;
+  top: 0;
+  width: 64px;
+  height: 34px;
+  color: var(--accent);
+  cursor: grab;
+  filter: drop-shadow(0 0 6px var(--accent));
+}
+.ap-thumb:active { cursor: grabbing; }
+.ap-spike { width: 100%; height: 100%; }
+
+/* ==================================================================
+   8. List view — squircle cards (title, role, timespan only)
+   ================================================================== */
+.list-group { margin-bottom: 34px; }
+
+.group-heading {
+  font-size: 1.25rem;
+  margin: 0 0 14px;
+  padding-left: 12px;
+  border-left: 4px solid var(--type-color);
+}
+
+.squircle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 14px;
+}
+
+.squircle {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+  color: var(--text);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-left: 4px solid var(--type-color);
+  border-radius: 22px;                /* the "squircle" rounding */
+  padding: 14px 18px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.squircle:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 26px rgba(0, 0, 20, 0.45);
+}
+.squircle-title { font-family: var(--font-heading); font-weight: 600; font-size: 0.98rem; }
+.squircle-role { color: var(--text-dim); font-size: 0.85rem; }
+.squircle-span { color: var(--accent); font-size: 0.8rem; }
+
+/* ==================================================================
+   9. Detailed List view — low-chrome document-style blocks
+   ================================================================== */
+.detailed-group { margin-bottom: 40px; }
+
+.detail-block {
+  padding: 22px 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12); /* subtle divider */
+}
+.detail-block:last-child { border-bottom: none; }
+
+/* ==================================================================
+   10. Shared detail card (modal popup + Detailed List blocks)
+   ================================================================== */
+.detail-header { margin-bottom: 10px; }
+
+.type-badge {
+  display: inline-block;
+  font-family: var(--font-heading);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #06123a;
+  background: var(--type-color);
+  border-radius: 999px;
+  padding: 3px 10px;
+  margin-bottom: 8px;
+}
+
+.detail-title { margin: 0 0 4px; font-size: 1.35rem; }
+.detail-meta { margin: 0; color: var(--text-dim); }
+.detail-timespan { margin: 2px 0 0; color: var(--accent); font-size: 0.9rem; }
+
+.detail-image {
+  border-radius: 12px;
+  margin: 12px 0;
+  max-height: 320px;
+  object-fit: cover;
+}
+
+.detail-body { font-size: 0.97rem; }
+.detail-body p { margin: 0.7em 0; }
+
+.detail-links { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
+.detail-link {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  padding: 5px 14px;
+  transition: background 0.2s;
+}
+.detail-link:hover { background: rgba(94, 231, 255, 0.18); }
+
+.card-endorsement {
+  margin: 14px 0 0;
+  padding: 12px 16px;
+  background: var(--card-bg);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  font-size: 0.92rem;
+}
+.card-endorsement footer { margin-top: 6px; color: var(--text-dim); font-size: 0.85rem; }
+
+/* --- Modal (popup) --- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(2, 6, 30, 0.7);
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.open { display: flex; }
+
+.modal-card {
+  position: relative;
+  width: min(680px, 100%);
+  max-height: 84vh;
+  overflow-y: auto;
+  background: linear-gradient(180deg, #0d1c6e, #081247);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 28px 30px;
+  box-shadow: 0 24px 70px rgba(0, 0, 15, 0.6);
+  animation: modal-in 0.22s ease;
+}
+@keyframes modal-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+.modal-close {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+.modal-close:hover { background: rgba(255, 255, 255, 0.22); }
+
+/* ==================================================================
+   11. Certifications — ML / DBMS / Cloud columns
+   ================================================================== */
+.cert-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 26px;
+}
+
+.cert-category {
+  font-size: 1.15rem;
+  margin: 0 0 14px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid var(--accent);
+}
+
+.cert-empty { color: var(--text-dim); font-style: italic; }
+
+.cert-card {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  color: var(--text);
+  text-decoration: none;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.cert-card:hover { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(0, 0, 20, 0.45); }
+
+.cert-icon { width: 38px; height: 38px; flex-shrink: 0; color: var(--accent); }
+.cert-text { display: flex; flex-direction: column; gap: 2px; }
+.cert-title { font-family: var(--font-heading); font-weight: 600; font-size: 0.93rem; }
+.cert-meta { color: var(--text-dim); font-size: 0.82rem; }
+
+/* ==================================================================
+   12. Endorsements — quote cards
+   ================================================================== */
+.endorsement-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 22px;
+}
+
+.endorsement-card {
+  margin: 0;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 24px 26px;
+}
+.endorsement-card blockquote {
+  margin: 0 0 14px;
+  font-size: 1.02rem;
+  font-style: italic;
+}
+.endorsement-card figcaption strong {
+  display: block;
+  font-family: var(--font-heading);
+}
+.endorsement-role { display: block; color: var(--text-dim); font-size: 0.85rem; }
+
+/* ==================================================================
+   13. Docs page — resume / CV stacked scrollable containers
+   ================================================================== */
+body.docs-page {
+  /* Spec: solid day-sky blue for the whole docs page. */
+  background: var(--bg-top);
+}
+
+.docs-main {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.doc-container {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.doc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--card-border);
+}
+.doc-header h2 { margin: 0; font-size: 1.2rem; }
+
+.doc-open { color: var(--text); transition: color 0.2s, transform 0.2s; }
+.doc-open:hover { color: var(--accent); transform: translateY(-2px); }
+.doc-open-icon { width: 22px; height: 22px; display: block; }
+
+/* Each document scrolls independently inside its container. */
+.doc-scroll { height: 70vh; overflow-y: auto; background: #ffffff; }
+.doc-frame { width: 100%; height: 100%; border: none; display: block; }
+
+/* ==================================================================
+   14. Responsive rules
+   ================================================================== */
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; gap: 30px; }
+  .tl-legend { margin-left: 0; }
+}
+
+/* Respect the visitor's reduced-motion preference: disable decorative
+   transitions/animations. JS also skips auto-cycling and the intro zoom. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hero-photo, .hero-statement,
+  .edu-step, .edu-figure-svg,
+  .squircle, .cert-card, .tl-soma, .modal-card {
+    transition: none !important;
+    animation: none !important;
+  }
+  .education-steps .edu-step { transition-delay: 0s; }
+}
+
+@media (max-width: 768px) {
+  .nav-links { gap: 14px; }
+  .nav-links a { font-size: 0.85rem; }
+  .section { padding: 44px 16px; }
+
+  /* Education steps stack vertically; staircase offsets removed. */
+  .education-steps { flex-direction: column; align-items: stretch; }
+  .edu-step:nth-child(n) { margin-bottom: 0; max-width: none; }
+
+  /* Timeline switches to vertical orientation (built by portfolio.js);
+     zoom controls don't apply there. */
+  .tl-zoom-controls { display: none; }
+}

@@ -28,11 +28,13 @@
    for smoother blending. Adjust the three gradient stops below.
    ================================================================== */
 :root {
-  /* --- background gradient stops (top → middle → bottom) --- */
-  --bg-top:      #2b57ec;   /* day-sky blue behind the hero            */
-  --bg-mid:      #101c8a;   /* transition blue behind education        */
-  --bg-timeline: #050f6b;   /* deep nerve blue behind the timeline     */
-  --bg-deep:     #041a40;   /* night blue behind certs/endorsements    */
+  /* --- background gradient stops (top → middle → bottom) ---
+     Anchors per spec: #2756FF at the very top, #001176 at the timeline,
+     #041A40 at the bottom. --bg-mid is only a blend stop for smoothness. */
+  --bg-top:      #2756FF;   /* day-sky blue at the very top of the page */
+  --bg-mid:      #1233bb;   /* blend stop behind education              */
+  --bg-timeline: #001176;   /* deep nerve blue behind the timeline      */
+  --bg-deep:     #041A40;   /* night blue behind certs/endorsements     */
 
   /* --- text + accents --- */
   --text:        #ffffff;
@@ -70,15 +72,21 @@ body {
   color: var(--text);
   font-family: var(--font-body);
   line-height: 1.6;
-  /* The full-page gradient: sky → nerve blue → night. */
+  /* One gradient across the FULL DOCUMENT HEIGHT that scrolls with the
+     content (no background-attachment: fixed — that pins it to the viewport
+     and made every scroll position look the same). The page gets darker as
+     you scroll: sky blue → nerve blue at the timeline → night at the bottom.
+     Tune the % stops if sections move. */
   background: linear-gradient(
     180deg,
     var(--bg-top)      0%,
     var(--bg-mid)      28%,
     var(--bg-timeline) 52%,
-    var(--bg-deep)     85%
+    var(--bg-deep)     100%
   );
-  background-attachment: fixed; /* gradient stays put while scrolling */
+  /* Guard against any stray horizontal overflow exposing the page edge
+     behind the sticky nav on mobile (clip doesn't break position:sticky). */
+  overflow-x: clip;
 }
 
 h1, h2, h3, h4 { font-family: var(--font-heading); line-height: 1.25; }
@@ -106,19 +114,41 @@ body.modal-open { overflow: hidden; } /* freeze page scroll behind popup */
 /* ==================================================================
    3. Sticky top nav
    ================================================================== */
+/* The bar itself spans the FULL viewport width at every breakpoint (it
+   carries the background); .nav-inner holds and centers the content. */
 .top-nav {
   position: sticky;
   top: 0;
   z-index: 100;
+  width: 100%;
+  background: rgba(4, 12, 60, 0.55);      /* translucent over the gradient */
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nav-inner {
+  max-width: 1200px;
+  margin: 0 auto;
   height: var(--nav-height);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  background: rgba(4, 12, 60, 0.55);      /* translucent over the gradient */
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
+
+/* Hamburger toggle — hidden on desktop, shown ≤768px (see responsive). */
+.nav-toggle {
+  display: none;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  background: none;
+  border: none;
+  padding: 0;
+}
+.nav-toggle .nav-icon { width: 26px; height: 26px; }
 
 .nav-links { display: flex; gap: 26px; }
 
@@ -183,8 +213,15 @@ body.modal-open { overflow: hidden; } /* freeze page scroll behind popup */
 }
 .hero-statement.fading { opacity: 0; }
 
-/* Tracker bubbles: one dot per statement; the active one glows. */
-.hero-bubbles { display: flex; gap: 10px; }
+/* Tracker bubbles: one dot per statement; the active one glows.
+   Sits at the bottom of the hero, centered under BOTH columns. */
+.hero-bubbles {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 8px;
+}
 .bubble {
   width: 12px;
   height: 12px;
@@ -692,13 +729,30 @@ body.docs-page {
 }
 
 @media (max-width: 768px) {
-  .nav-links { gap: 14px; }
-  .nav-links a { font-size: 0.85rem; }
+  /* Nav collapses to hamburger + icons; text links live in a dropdown. */
+  .nav-toggle { display: flex; }
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: var(--nav-height);
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    gap: 0;
+    background: rgba(4, 12, 60, 0.96);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 6px 0;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links a { padding: 13px 24px; border-bottom: none; }
+
   .section { padding: 44px 16px; }
 
-  /* Education steps stack vertically; staircase offsets removed. */
+  /* Education steps stack vertically as plain cards; staircase offsets and
+     the credential-lifting figure are desktop-only. */
   .education-steps { flex-direction: column; align-items: stretch; }
   .edu-step:nth-child(n) { margin-bottom: 0; max-width: none; }
+  .edu-figure { display: none; }
 
   /* Timeline switches to vertical orientation (built by portfolio.js);
      zoom controls don't apply there. */

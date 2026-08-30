@@ -10,10 +10,10 @@
 import {
   HERO_IMAGES,
   HERO_STATEMENTS,
-  HERO_STATEMENT_INTERVAL_MS,
-  HERO_PHOTO_INTERVAL_MS,
+  HERO_CYCLE_INTERVAL_MS,
   EDUCATION_PATHS,
 } from './content.js';
+import { scrollToHash } from './nav.js'; // also wires smooth scroll + hamburger
 import { parseFrontmatter, parseSchemaDate, formatSchemaDate, esc } from './frontmatter.js';
 import { initPortfolioSections } from './portfolio.js';
 
@@ -22,52 +22,28 @@ const prefersReducedMotion = () =>
   window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ================================================================== */
-/* Nav — smooth scroll for same-page anchor links                      */
+/* Hero — photos + statements advance IN SYNC on one shared timer      */
 /* ================================================================== */
 
-function initNav() {
-  document.querySelectorAll('a[href^="#"]').forEach((link) => {
-    link.addEventListener('click', (e) => {
-      const target = document.querySelector(link.getAttribute('href'));
-      if (!target) return;
-      e.preventDefault();
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-  });
-}
+function initHero() {
+  const photoHost = document.getElementById('hero-photos');
+  const textEl = document.getElementById('hero-statement');
+  const bubbleHost = document.getElementById('hero-bubbles');
+  if (!photoHost || !textEl || !bubbleHost || HERO_STATEMENTS.length === 0) return;
 
-/* ================================================================== */
-/* Hero — rotating photos + cycling statements + tracker bubbles       */
-/* ================================================================== */
-
-function initHeroPhotos() {
-  const host = document.getElementById('hero-photos');
-  if (!host || HERO_IMAGES.length === 0) return;
-  host.replaceChildren();
+  // Build the photo stack.
+  photoHost.replaceChildren();
   HERO_IMAGES.forEach((img, i) => {
     const el = document.createElement('img');
     el.src = img.src;
     el.alt = img.alt;
     el.className = 'hero-photo' + (i === 0 ? ' active' : '');
     el.loading = i === 0 ? 'eager' : 'lazy';
-    host.appendChild(el);
+    photoHost.appendChild(el);
   });
-  if (prefersReducedMotion()) return; // show the first photo, no auto-rotation
-  let current = 0;
-  setInterval(() => {
-    const photos = host.querySelectorAll('.hero-photo');
-    photos[current].classList.remove('active');
-    current = (current + 1) % photos.length;
-    photos[current].classList.add('active');
-  }, HERO_PHOTO_INTERVAL_MS);
-}
+  const photos = photoHost.querySelectorAll('.hero-photo');
 
-function initHeroStatements() {
-  const textEl = document.getElementById('hero-statement');
-  const bubbleHost = document.getElementById('hero-bubbles');
-  if (!textEl || !bubbleHost || HERO_STATEMENTS.length === 0) return;
-
-  // Build one tracker bubble per statement; clicking a bubble jumps to it.
+  // One tracker bubble per statement; clicking a bubble jumps the whole cycle.
   bubbleHost.replaceChildren();
   HERO_STATEMENTS.forEach((_, i) => {
     const b = document.createElement('button');
@@ -80,10 +56,12 @@ function initHeroStatements() {
 
   let current = 0;
   let timer = null;
+  /** Advance photo N and statement N together (photo wraps if fewer images). */
   const show = (idx, manual = false) => {
     bubbles[current].classList.remove('active');
     current = idx;
     bubbles[current].classList.add('active');
+    photos.forEach((p, i) => p.classList.toggle('active', i === current % photos.length));
     // Fade the text out, swap it, fade back in.
     textEl.classList.add('fading');
     setTimeout(() => {
@@ -95,7 +73,7 @@ function initHeroStatements() {
   const restart = () => {
     clearInterval(timer);
     if (prefersReducedMotion()) return; // bubbles still work; no auto-advance
-    timer = setInterval(() => show((current + 1) % HERO_STATEMENTS.length), HERO_STATEMENT_INTERVAL_MS);
+    timer = setInterval(() => show((current + 1) % HERO_STATEMENTS.length), HERO_CYCLE_INTERVAL_MS);
   };
   textEl.textContent = HERO_STATEMENTS[0];
   restart();
@@ -179,8 +157,12 @@ function renderEducation(entries) {
 /* Boot                                                                */
 /* ================================================================== */
 
-initNav();
-initHeroPhotos();
-initHeroStatements();
-loadEducation().then(renderEducation).catch((err) => console.error('Education load failed:', err));
-initPortfolioSections().catch((err) => console.error('Portfolio load failed:', err));
+initHero();
+Promise.allSettled([
+  loadEducation().then(renderEducation).catch((err) => console.error('Education load failed:', err)),
+  initPortfolioSections().catch((err) => console.error('Portfolio load failed:', err)),
+]).then(() => {
+  // Content is in place — now the section heights are final, so a cross-page
+  // link like index.html#endorsements can land on the right spot.
+  scrollToHash();
+});

@@ -177,9 +177,9 @@ git add -A && git commit -m "Build portfolio site" && git push
 
 # Instructions on Theme, Colors, and Fonts
 
-Home page background color: smooth gradient from 2756FF5 at top of page to 001176 for the timeline and to 041A40 below this (a little bit darker than the day sky to night time blue). Text on page should be white to be clear on this background
+Home page background color: smooth gradient from #2756FF at top of page to #001176 for the timeline and to #041A40 below this (a little bit darker than the day sky to night time blue). Text on page should be white to be clear on this background
 
-Docs page background color: 2756FF5 for full page
+Docs page background color: #2756FF for full page
 
 Use Montserrat for titles/headings/nav bar and Open Sans or Futura PT for regular text. Leave this as a commented configurable, so I can change this later easily if I want
 
@@ -187,7 +187,7 @@ On home page,
 
 Since I'm a biomedical engineer, the theme of the timeline is the nervous system, which is why I have this blue gradation. I want a scrollable nervous system timeline where the actual timeline is a major nerve/spinal cord and each timeline event is like a nerve branching from the central nerve. The scroll bar should look like an action potential going down the central nerve/spinal cord that allows the user to scroll. I have a picture of a neuron for reference in this folder (neuron.jpg), but you may find other sources if you think they look cleaner. 
 
-The main idea was to start with medium darkness blue at top like 2756FF5, and move to a darker nervous system blue for the timeline, and then get even darker below that for the certs and endorsements sections, so the whole page is a blue gradient. What I have provided are sample colors, feel free to use different blue shades than the hex codes I have provided to make the page look more natural and visually appealing. 
+The main idea was to start with medium darkness blue at top like #2756FF, and move to a darker nervous system blue for the timeline, and then get even darker below that for the certs and endorsements sections, so the whole page is a blue gradient. What I have provided are sample colors, feel free to use different blue shades than the hex codes I have provided to make the page look more natural and visually appealing. 
 
 Make sure the html/css code is well documented and organized in a way such that I can easily modify code manually to play with background colors/themes/visuals
 

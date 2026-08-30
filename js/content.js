@@ -80,6 +80,6 @@ export const HERO_STATEMENTS = [
   "I'm a mentor.",
 ];
 
-/** Milliseconds between hero statement / photo transitions. */
-export const HERO_STATEMENT_INTERVAL_MS = 3500;
-export const HERO_PHOTO_INTERVAL_MS = 5000;
+/** Milliseconds between hero transitions — photos and statements advance
+    together on this one shared timer. */
+export const HERO_CYCLE_INTERVAL_MS = 4000;

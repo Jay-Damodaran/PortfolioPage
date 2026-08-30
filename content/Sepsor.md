@@ -1,5 +1,5 @@
 ---
-title: "SEPSOR- sepsis early warning system"       # card heading + timeline label + list title
+title: "SEPSOR- sepsis early alert"       # card heading + timeline label + list title
 type: project                    # one of: project | competition | work | experience  (drives color/icon + grouping)
 role: "software and electrical design"          # shown in List squircle and detail card
 start: 2026-02                      # timeline placement + timespan display

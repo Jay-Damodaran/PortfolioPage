@@ -277,12 +277,15 @@ const TL = {
   branchBase: 64,      // distance from cord to the first lane of nodes (px)
   laneGap: 74,         // extra distance per stacked lane (px)
   nodeRadius: 15,
-  collisionPx: 95,     // nodes closer than this (px) stack into new lanes
+  collisionPx: 150,    // nodes closer than this (px) stack into new lanes —
+                       // sized to a full label width so labels never overlap
   cordAmp: 10,         // amplitude of the cord's sine wiggle (px)
   cordWave: 220,       // wavelength of the wiggle (px)
   defaultPxPerMonth: 26, // zoom level the intro animation lands on
   maxPxPerMonth: 110,
   vertPxPerMonth: 16,  // fixed density for the mobile vertical layout
+  vertMinGap: 56,      // minimum vertical px between consecutive nodes on
+                       // mobile — guarantees labels never collide
 };
 
 const tl = {
@@ -374,7 +377,9 @@ function buildTimelineSvg(pxPerMonth) {
     // Organic branch: cubic curve drifting slightly sideways.
     const branch = `M ${x} ${cy0} C ${x + 8} ${cy0 + side * 20}, ${x - 8} ${ny - side * 20}, ${x} ${ny + side * TL.nodeRadius}`;
     const labelY = ny + side * (TL.nodeRadius + 18);
-    const title = item.title.length > 26 ? item.title.slice(0, 24) + '…' : item.title;
+    // Truncate so a label is always narrower than collisionPx (no overlaps);
+    // the full title remains on the node's aria-label and in the detail card.
+    const title = item.title.length > 22 ? item.title.slice(0, 21) + '…' : item.title;
     nodes += `
       <g class="tl-node" data-idx="${idx}" tabindex="0" role="button"
          aria-label="${esc(cfg.label)}: ${esc(item.title)}" style="--type-color:${cfg.color}">
@@ -395,13 +400,26 @@ function buildTimelineSvg(pxPerMonth) {
     </svg>` };
 }
 
-/** Build the vertical (mobile) timeline SVG — axis runs top to bottom. */
+/**
+ * Build the vertical (mobile) timeline SVG — axis runs top to bottom.
+ * The cord is CENTERED; branch nerves alternate left/right of it. Nodes keep
+ * date order but are pushed down to at least `vertMinGap` apart, so labels
+ * (drawn centered under each node) can never collide.
+ */
 function buildVerticalSvg() {
   const pxPerMonth = TL.vertPxPerMonth;
-  const placedItems = assignLanes(tl.items, pxPerMonth); // x is axis position (vertical)
   const W = Math.min(window.innerWidth - 24, 420);
-  const xc = 40; // cord near the left edge; branches extend right
-  const H = axisPos(tl.maxDate, pxPerMonth) + TL.padX;
+  const xc = W / 2; // cord down the middle; branches fan to both sides
+  const branchLen = Math.min(84, W * 0.2);
+
+  // Place nodes: true date position, nudged down to keep the minimum gap.
+  let prevPos = -Infinity;
+  const placedItems = tl.items.map((item, i) => {
+    const pos = Math.max(axisPos(item.start.date, pxPerMonth), prevPos + TL.vertMinGap);
+    prevPos = pos;
+    return { item, x: pos, side: i % 2 === 0 ? -1 : 1, level: 0 };
+  });
+  const H = Math.max(axisPos(tl.maxDate, pxPerMonth), prevPos + TL.vertMinGap) + TL.padX;
   const cordX = (y) => xc + 6 * Math.sin(y / 160);
 
   let cordPath = `M ${cordX(0)} 0`;
@@ -412,16 +430,17 @@ function buildVerticalSvg() {
     const pos = axisPos(new Date(y, 0, 1), pxPerMonth);
     ticks += `
       <circle cx="${cordX(pos)}" cy="${pos}" r="3.5" class="tl-year-tick"/>
-      <text x="6" y="${pos - 8}" class="tl-year-label">${y}</text>`;
+      <text x="${cordX(pos)}" y="${pos - 10}" class="tl-year-label" text-anchor="middle">${y}</text>`;
   }
 
   let nodes = '';
-  placedItems.forEach(({ item, x: pos, level }, idx) => {
+  placedItems.forEach(({ item, x: pos, side }, idx) => {
     const cfg = TYPE_CONFIG[item.type];
-    const nx = xc + 70 + level * 26; // all branches to the right on mobile
+    const nx = xc + side * branchLen;
     const cx0 = cordX(pos);
-    const branch = `M ${cx0} ${pos} C ${cx0 + 20} ${pos + 8}, ${nx - 20} ${pos - 8}, ${nx - TL.nodeRadius} ${pos}`;
-    const title = item.title.length > 30 ? item.title.slice(0, 28) + '…' : item.title;
+    const branch = `M ${cx0} ${pos} C ${cx0 + side * 24} ${pos + 8}, ${nx - side * 24} ${pos - 8}, ${nx - side * TL.nodeRadius} ${pos}`;
+    // Short truncation so a centered label stays on its own side of the cord.
+    const title = item.title.length > 18 ? item.title.slice(0, 17) + '…' : item.title;
     nodes += `
       <g class="tl-node" data-idx="${idx}" tabindex="0" role="button"
          aria-label="${esc(cfg.label)}: ${esc(item.title)}" style="--type-color:${cfg.color}">
@@ -429,7 +448,7 @@ function buildVerticalSvg() {
         ${dendrites(nx, pos, cfg.color)}
         <circle cx="${nx}" cy="${pos}" r="${TL.nodeRadius}" class="tl-soma" fill="${cfg.color}"/>
         <text x="${nx}" y="${pos + 5}" class="tl-glyph" text-anchor="middle">${cfg.glyph}</text>
-        <text x="${nx + TL.nodeRadius + 8}" y="${pos + 5}" class="tl-label">${esc(title)}</text>
+        <text x="${nx}" y="${pos + TL.nodeRadius + 16}" class="tl-label" text-anchor="middle">${esc(title)}</text>
       </g>`;
   });
 

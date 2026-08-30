@@ -23,10 +23,13 @@ Quick map of what lives where:
 Open `css/styles.css`. The entire theme is CSS variables in the `:root` block
 at the top (section `1. THEME CONFIG`):
 
-- **Background gradient** — four stops: `--bg-top` (hero sky blue), `--bg-mid`,
-  `--bg-timeline` (nerve blue), `--bg-deep` (night blue). The gradient itself
-  is on `body` right below (`background: linear-gradient(...)`); adjust the
-  percentage stops there to move where the color transitions happen on the page.
+- **Background gradient** — four stops: `--bg-top` (#2756FF sky blue at the
+  very top), `--bg-mid` (blend), `--bg-timeline` (#001176 nerve blue),
+  `--bg-deep` (#041A40 night blue). The gradient is on `body` right below and
+  spans the full document height, scrolling with the content — do NOT add
+  `background-attachment: fixed` (that pins it to the viewport and the page
+  stops getting darker as you scroll). Adjust the percentage stops there to
+  move where the color transitions happen on the page.
 - **Accent** — `--accent` is the electric-cyan used for the nerve glow, links,
   bubbles, and highlights.
 - **Item type colors** — `--type-project`, `--type-competition`, `--type-work`,
@@ -66,9 +69,11 @@ Notes:
 ## 3. Hero
 
 - Photos and statements: the `HERO_IMAGES` and `HERO_STATEMENTS` arrays in
-  `js/content.js`. Bubbles are generated automatically, one per statement.
-- Cycle speeds: `HERO_STATEMENT_INTERVAL_MS` / `HERO_PHOTO_INTERVAL_MS` in the
-  same file.
+  `js/content.js`. Both advance together on ONE shared timer (image N shows
+  with statement N; images wrap around if there are fewer of them). Bubbles
+  are generated automatically, one per statement, and sit centered at the
+  bottom of the hero.
+- Cycle speed: `HERO_CYCLE_INTERVAL_MS` in the same file.
 - Text ("Hi, I'm Jay.") is in `index.html`.
 
 ## 4. Education animation
@@ -78,7 +83,9 @@ Notes:
 - The figure itself is the `FIGURE_SVG` constant in `js/main.js` — swap in a
   graduation-cap or suit-and-briefcase variant there when your status changes
   (it's a tiny inline SVG; keep the `edu-figure-*` class names so it stays
-  styled and animated).
+  styled and animated). The figure is desktop-only: on mobile it's hidden
+  (`.edu-figure { display: none; }` in the 768px media query) and education
+  shows as plain cards with the same one-by-one reveal.
 - Reveal timing: the `0.45s` stagger in `css/styles.css` (`.edu-step`
   `transition-delay`). The "staircase" height offsets are the
   `.edu-step:nth-child(...)` rules right below.
@@ -112,8 +119,16 @@ once and every view updates. Its styling is `css/styles.css` section 10.
 - Links and the three icon buttons: in the `<nav>` of both `index.html` and
   `docs.html` (they're duplicated — keep them in sync). The placeholder
   GitHub/LinkedIn/email URLs are marked `TODO(Jay)`.
+- The nav bar spans the full viewport width; `.nav-inner` centers the content.
+  On mobile (≤768px) the text links collapse into a hamburger dropdown (the
+  behavior lives in `js/nav.js`, shared by both pages); the three icons stay
+  visible in the bar.
 - Adding a section link: give the section an `id` in `index.html` and add
-  `<a href="#that-id">` to the nav. Smooth scrolling is automatic.
+  `<a href="#that-id">` to the nav on **index.html**, and
+  `<a href="index.html#that-id">` on **docs.html** (in-page `#` anchors only
+  resolve on the page that has the section). Smooth scrolling is automatic,
+  and `js/main.js` re-scrolls to the hash after content loads so cross-page
+  links land on the right section.
 
 ## 8. Docs page
 

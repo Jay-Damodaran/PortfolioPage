@@ -1,8 +1,9 @@
 ---
-# TODO: stub entry — replace dates, role, links, and body with real details
-title: "Texas Datahack"
+title: "Texas Datahack Finalist"
 type: competition
-start: 2024-03                      # TODO: real date
-end: 2024-03                        # TODO: real date
+start: 2025-03                      
+end: 2025-03                        
 ---
-TODO: Describe the Texas Datahack project, team, and outcome.
+- Performed time-series weather forecasting using Vector Autoregressor and LSTM to set optimal insurance price over a period with an anticipated natural disaster
+- Conducted EDA and uncovered a near perfect spearman correlation between wind speed and predicted damage, informing pricing model
+

@@ -1,8 +1,11 @@
 ---
-# TODO: stub entry — replace dates, role, links, and body with real details
 title: "Chest X-Ray Pneumonia Diagnosis"
 type: project
-start: 2021-08                      # TODO: real date
-end: 2021-10                        # TODO: real date
+start: 2024-03                      
+end: 2024-05                        
 ---
-TODO: Describe the chest x-ray pneumonia diagnosis model — dataset, CNN architecture, and results.
+I used a Kaggle pneumonia dataset with normal, bacterial, and viral chest x-ray images to perform AI based image diagnosis. 
+
+- Implemented literature backed data augmentation techniques (translation, brightness changes, small rotations, etc.) to address class imbalances and diversify dataset
+- Designed custom Convolutional Neural Networks in PyTorch as well using a pre-trained ResNet to classify images and predict the diagnosis with >80% test accuracy
+

@@ -1,9 +1,11 @@
 ---
-# TODO: stub entry — replace dates, type, role, links, and body with real details
-title: "SureStreak Inc."
+title: "Data Analytics Intern"
 type: work
-role: "TODO"
-start: 2025-01                      # TODO: real date
-end: 2025-05                        # TODO: real date
+role: "Data Analytics Intern"
+org: "SureStreak Inc."
+start: 2025-06                      
+end: 2025-08                        
 ---
-TODO: Describe the SureStreak Inc. work.
+- Developed Python pipeline with YOLO to extract and tabularize ball position and velocity from golf-roll videos
+- Designed and tuned Physics Based Model for customers to predict ball roll with the Velocity Verlet method
+- Validated model against real ball rolls, revealing median error in predicted distance of 6.8% on uphill rolls

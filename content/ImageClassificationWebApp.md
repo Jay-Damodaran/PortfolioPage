@@ -1,8 +1,11 @@
 ---
-# TODO: stub entry — replace dates, role, links, and body with real details
-title: "Image Classification Web App"
-type: project
-start: 2021-01                      # TODO: real date
-end: 2021-03                        # TODO: real date
+title: "Data Science Intern"
+type: work
+role: "Data Science Intern"
+org: "Tridiagonal Software Inc." 
+start: 2022-06                      
+end: 2023-04
 ---
-TODO: Describe the image classification web app — model architecture, dataset, framework, and how it was deployed.
+- Built end-to-end AI image classification app with TensorFlow CNNs, OpenCV preprocessing, and Voilà/ipywidgets
+- Enabled process engineers to load data, train models, and evaluate results through a browser-based interface
+

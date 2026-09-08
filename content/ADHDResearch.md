@@ -1,9 +1,11 @@
 ---
-# TODO: stub entry — replace dates, org, role, links, and body with real details
 title: "ADHD Research"
-type: experience
-role: "Research Assistant"          # TODO: real role
-start: 2024-09                      # TODO: real date
-end: 2025-01                        # TODO: real date
+type: Experience
+role: "Undergraduate Research Assistant"          
+org: "The Dynamic Medical Image and Computing Lab"
+start: 2024-06                      
+end: 2026-01                        
 ---
-TODO: Describe the ADHD research — lab, methods, and contribution.
+
+- Identified sex-invariant EEG features distinguishing ADHD from non-ADHD adults with custom Pytorch models
+- Applied ML interpretability methods on sex-stratified ADHD classifiers to gain insight into sex differences 

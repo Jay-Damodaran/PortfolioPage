@@ -1,8 +1,12 @@
 ---
-# TODO: stub entry — replace dates, type, role, links, and body with real details
 title: "Negative Emissions Technology"
-type: project
-start: 2022-02                      # TODO: real date
-end: 2022-05                        # TODO: real date
+type: experience
+role: "Automation Team Member"
+org: "Negative Emissions Technology"
+start: 2023-09                      
+end: 2025-05                        
 ---
-TODO: Describe the negative emissions technology work.
+I worked on the software team for a Direct Air Carbon Capture Device (DAC) with adsorption, heating, and desorption states
+- collaborated on C++ FSM code to manage DAC system state transitions 
+- Utilized PID-based temperature control with control logic based on system state
+- Designed Air Pump Adaptor Component in Fusion360 for DAC

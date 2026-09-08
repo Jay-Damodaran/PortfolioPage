@@ -15,6 +15,7 @@ export const PORTFOLIO_PATHS = [
   'content/HeartFailureClassification.md',
   'content/ImageClassificationWebApp.md',
   'content/ChestXrayPneumonia.md',
+  'content/MLProjectLead.md',
   'content/EMGDirector.md',
   'content/NegativeEmissionsTech.md',
   'content/TexasDatahack.md',
@@ -49,6 +50,9 @@ export const EDUCATION_PATHS = [
 export const CERTIFICATION_PATHS = [
   'content/certifications/MathforML.md',
   'content/certifications/AzureRAG.md',
+  'content/certifications/MSSQLServer.md',
+  'content/certifications/MSSQLServerAdvanced.md',
+  'content/certifications/GANs.md'
 ];
 
 /** Category headings, in display order. Add a heading here to create a new column. */

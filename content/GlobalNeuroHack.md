@@ -1,5 +1,5 @@
 ---
-title: "Global NeuroHack- 2nd place"       # card heading + timeline label + list title
+title: "FABLE- 2nd place"       # card heading + timeline label + list title
 type: competition                    # one of: project | competition | work | experience  (drives color/icon + grouping)
 role: "member"          # shown in List squircle and detail card
 org: "Longhorn Neurotech"

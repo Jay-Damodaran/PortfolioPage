@@ -65,6 +65,19 @@ Notes:
 - Certification `category` must be one of the headings in
   `CERTIFICATION_CATEGORIES` (`js/content.js`); add a new heading there to
   create a new column (e.g. "Security").
+- Frontmatter keys must be spelled exactly as in the schema. For example, a
+  portfolio item's photo goes under `image:` (singular). An unknown key such as
+  `images:` is ignored without any error, so the photo just won't show.
+
+### Image file types
+
+- Use **only `.jpg`/`.jpeg`, `.png`, or `.webp`** for anything in `images/`.
+- **Never use `.heic`** (the iPhone default). Chrome, Edge, and Firefox can't
+  display it, so the image shows up blank everywhere except Safari. Convert it
+  first (Windows Photos → Save as → JPG), or set your iPhone to
+  Settings → Camera → Formats → *Most Compatible*.
+- Prefer JPG for photos and keep each one under ~1 MB (around 2000px on the
+  long side is plenty). Multi-MB photos make the page load slowly.
 
 ## 3. Hero
 
@@ -74,6 +87,10 @@ Notes:
   are generated automatically, one per statement, and sit centered at the
   bottom of the hero.
 - Cycle speed: `HERO_CYCLE_INTERVAL_MS` in the same file.
+- Photo fit: `.hero-photo { object-fit: contain; }` in `css/styles.css` shows
+  every photo whole, with bars around any photo that isn't 4:3. Switch it to
+  `cover` to fill the frame instead (this crops the edges). The frame's shape
+  is `aspect-ratio: 4 / 3` on `.hero-photos`.
 - Text ("Hi, I'm Jay.") is in `index.html`.
 
 ## 4. Education animation

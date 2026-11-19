@@ -5,9 +5,11 @@ role: "Learning Assistant"
 org: "Department of Biomedical Engineering, The University of Texas at Austin"   
 start: 2026-08                      
 end: present
+image: images/BME343_Learning Assistant.jpg
 ---
 
 Serve as a Learning Assistant for Signals and Systems, supporting students in a core engineering course through weekly office hours.
-- Assisted 5 students in office hours so far, guiding them toward solutions rather than handing them answers and pushing them to reason critically about the problems in front of them
+- Assisted several students in office hours so far, guiding them toward solutions rather than handing them answers and pushing them to reason critically about the problems in front of them
 - Expect to support many more students over the course of the semester, extending the department's instructional capacity beyond what the teaching staff can cover alone
-- Expected to lead an exam review session and design practice problems later in the semester
+- Developed and Lead an exam review session
+- Graded Assignments and Exams providing feedback on student errors to support their learning experience

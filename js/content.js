@@ -33,6 +33,7 @@ export const PORTFOLIO_PATHS = [
   'content/ESSTutoring.md',
   'content/Civassist.md',
   'content/LearningAssistant.md',
+  'content/ARcher.md'
 ];
 
 /* ------------------------------------------------------------------ */
@@ -63,7 +64,6 @@ export const CERTIFICATION_CATEGORIES = ['ML', 'DBMS', 'Cloud'];
 /* ------------------------------------------------------------------ */
 export const ENDORSEMENT_PATHS = [
   'content/endorsements/Dev.md',
-  'content/endorsements/Russel.md',
 ];
 
 /* ------------------------------------------------------------------ */
@@ -73,17 +73,22 @@ export const HERO_IMAGES = [
   { src: 'images/ProfessionalPhoto.jpeg', alt: 'Jay — professional photo' },
   { src: 'images/GlobalNeurohack.jpeg', alt: 'Jay at Global NeuroHack' },
   { src: 'images/SEPSOR.jpg', alt: 'Jay working on the SEPSOR device' },
-  { src: 'images/TexasHHSC.jpeg', alt: 'Jay at Texas HHSC' },
+  { src: 'images/Tremor_Logger.jpg', alt: 'Jay custom human activity recognition wearable' },
+  { src: 'images/Micro_Soldering.png', alt: 'Jay soldering under a microscope' },
+  { src: 'images/BME343_Teaching.png', alt: 'Jay leading signals review' },
+  { src: 'images/EMG_Director.png', alt: 'Jay leading emg project' }
 ];
 
 export const HERO_STATEMENTS = [
   "I'm a biomedical engineer.",
   "I'm passionate about AI in healthcare.",
-  "I'm a medical device developer.",
+  "I love medical device development.",
   "I'm working on edge AI wearables.",
+  "I'm a builder.",
   "I'm a mentor.",
+  "I'm a hands-on leader."
 ];
 
 /** Milliseconds between hero transitions — photos and statements advance
     together on this one shared timer. */
-export const HERO_CYCLE_INTERVAL_MS = 4000;
+export const HERO_CYCLE_INTERVAL_MS = 2500;
